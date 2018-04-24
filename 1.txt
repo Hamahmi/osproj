@@ -1,0 +1,88 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
+public class Operator {
+	static ArrayList<Player> Players = new ArrayList<Player>();
+	static ArrayList<Player> Queue = new ArrayList<Player>();
+	static Wheel wheel;
+	static ArrayList<Player> Waiting = new ArrayList<Player>();
+
+	public Operator() throws NumberFormatException, IOException,
+			InterruptedException {
+		BufferedReader br = new BufferedReader(new FileReader(
+				"C:\\Users\\Sarah\\Desktop\\input-2.txt"));
+		PrintStream out = new PrintStream(new FileOutputStream("C:\\Users\\Sarah\\Desktop\\out.txt"));
+		System.setOut(out);
+		int max_wait_time = Integer.parseInt(br.readLine());
+
+		int count_players = Integer.parseInt(br.readLine());
+		wheel = new Wheel(5, max_wait_time);
+
+		for (int i = 0; i < count_players; i++) {
+			String line = br.readLine();
+			String[] array = line.split(",");
+			int id = Integer.parseInt(array[0]);
+			int waiting_time = Integer.parseInt(array[1]);
+			Player p = new Player(id, waiting_time);
+			Players.add(p);
+		}
+		wheel.start();
+		for (int i = 0; i < count_players; i++) {
+			Players.get(i).start();
+
+		}
+		
+	}
+
+	public static synchronized void ride(Player p) throws InterruptedException {
+		Queue.add(p);
+		if (wheel.onBoard_Players.size() < 5) {
+			ride1(p);
+		}
+	}
+
+	public static void ride1(Player p) throws InterruptedException {
+		System.out.println("passing player: " + p.ID + "  to the operator");
+		if (p.onboard_flag == false && p.ride_complete_flag == false) {
+			if (wheel.onBoard_Players.size() == 4) {
+				wheel.load_players(p);
+				//maxWaitReached();
+				wheel.wheel.interrupt();
+
+			} else if (wheel.onBoard_Players.size() < 4) {
+				wheel.load_players(p);
+			}
+
+		}
+
+	}
+
+	public static void maxWaitReached() throws InterruptedException {
+		wheel.run_ride();
+		wheel.end_ride();
+
+		if (Queue.size() >= 5) {
+			for (int i = 0; i < 5; i++) {
+				ride1(Queue.get(0));
+				Queue.remove(0);
+			}
+		} else {
+			for (int i = 0; i < Queue.size(); i++) {
+				ride1(Queue.get(0));
+				Queue.remove(0);
+			}
+		}
+	}
+
+	public static void main(String[] args) throws NumberFormatException,
+			IOException, InterruptedException {
+		Operator o = new Operator();
+
+	}
+
+}

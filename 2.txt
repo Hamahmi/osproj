@@ -1,0 +1,22 @@
+
+public class Player extends Thread{
+	int ID;
+	int waiting_time;
+	boolean onboard_flag = false;
+	boolean ride_complete_flag = false;
+	Thread thread = new Thread();
+	public Player(int ID,int waiting_time){
+		this.ID = ID;
+		this.waiting_time = waiting_time;
+	}
+	public void run(){
+		try {
+			this.thread.sleep(this.waiting_time);
+			System.out.println("Player "+this.ID+" wakes up");
+			Operator.ride(this);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

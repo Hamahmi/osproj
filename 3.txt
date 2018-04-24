@@ -1,0 +1,73 @@
+import java.util.ArrayList;
+
+public class Wheel extends Thread {
+	int capacity;
+	 int count_onBoard_players;
+	ArrayList<Player> onBoard_Players = new ArrayList<Player>();
+	int max_waiting_time;
+	Thread wheel;
+
+	public Wheel(int c, int time) {
+		wheel = new Thread();
+		this.capacity = c;
+		this.max_waiting_time = time;
+
+	}
+
+	public void run() {
+
+		try {
+			while (Operator.Players.size()>0) {
+				System.out.println("Wheel starts sleep...........................");
+				this.wheel.sleep(this.max_waiting_time);
+				System.out.println("Wheel ends sleep--------------");
+				Operator.maxWaitReached();
+
+				
+          } 
+				}catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public synchronized void load_players(Player p) throws InterruptedException {
+		p.onboard_flag = true;
+		this.onBoard_Players.add(p);
+		this.count_onBoard_players++;
+		System.out.println("Player "+p.ID+ " on board , capacity: " +this.count_onBoard_players);
+
+
+	}
+
+	public void run_ride() {
+		String s ="";
+		for (int i = 0; i < this.onBoard_Players.size(); i++) {
+			Player p = this.onBoard_Players.get(i);
+			p.ride_complete_flag = true;
+			if(i==this.onBoard_Players.size()-1){
+				s=s+p.ID;
+				break;
+
+			}
+			s=s+p.ID+",";
+		}
+		if(this.onBoard_Players.size()==5){
+			System.out.println("Wheel is full, Let's go for a ride ");
+
+		}
+		System.out.println("Threads in this ride are: "+s);
+	}
+
+	public void end_ride() throws InterruptedException {
+      for(int i=0;i<this.onBoard_Players.size();i++){
+			Operator.Players.remove(this.onBoard_Players.get(i));
+		if(Operator.Queue.contains(this.onBoard_Players.get(i))){
+			Operator.Queue.remove(this.onBoard_Players.get(i));}
+		}
+
+		this.onBoard_Players = new ArrayList<Player>();
+		this.count_onBoard_players=0;
+		
+
+	}
+}
