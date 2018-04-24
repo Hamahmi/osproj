@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 
 public class Wheel extends Thread {
@@ -16,18 +17,30 @@ public class Wheel extends Thread {
 
 	public void run() {
 
-		try {
+		
 			while (Operator.Players.size()>0) {
 				System.out.println("Wheel starts sleep...........................");
-				this.wheel.sleep(this.max_waiting_time);
-				System.out.println("Wheel ends sleep--------------");
-				Operator.maxWaitReached();
+				try {
+					Thread.sleep(this.max_waiting_time);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				finally
+				{
+					System.out.println("Wheel ends sleep--------------");
+					try {
+						Operator.maxWaitReached();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
 
 				
-          } 
-				}catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+          
+				}
 	}
 
 	public synchronized void load_players(Player p) throws InterruptedException {
